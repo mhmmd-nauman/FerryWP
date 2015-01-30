@@ -18,12 +18,13 @@
   $not_human       = "Human verification incorrect.";
   $missing_content = "Please supply all information.";
   $email_invalid   = "Email Address Invalid.";
-  $message_unsent  = "Message was not sent. Try Again.";
+  $message_unsent  = "Message was not sent. Please fill required information.";
   $message_sent    = "Thanks! Your message has been sent.";
   if(!empty($_SESSION['POST_DATA'])){
   //user posted variables
+      
         $_POST=$_SESSION['POST_DATA'];
-        $name     = $_POST['message_name'];
+        $name     = $_POST['message_name']." ".$_POST['sure_name'];
         $email    = $_POST['message_email'];
         $message  = $_POST['message_text'];
         $human    = $_POST['message_human'];
@@ -37,22 +38,19 @@
   
         
         //validate presence of name and message
-        if(empty($name) || empty($message)){
-          my_contact_form_generate_response("error", $missing_content);
-        }
-        else //ready to go!
-        {
+        //echo "$to, $subject ,$email";
+        //exit;
           $sent = wp_mail($to, $subject, strip_tags($message), $headers);
           
          
           if($sent) my_contact_form_generate_response("success", $message_sent); //message sent!
           else my_contact_form_generate_response("error", $message_unsent); //message wasn't sent
-        }
-      
+        
+      $_SESSION['POST_DATA']="";
   }
   
   // if ($_POST['submitted']) my_contact_form_generate_response("error", $missing_content);
-print_r($_SESSION);
+//print_r($_SESSION);
 if($_GET['message' == 'success']) my_contact_form_generate_response("success", $message_sent);
 ?>
 
@@ -86,14 +84,17 @@ if($_GET['message' == 'success']) my_contact_form_generate_response("success", $
                               </style>
                                 <div id="respond">
                                 <?php echo $response; ?>
+                                <?php //if($_GET['message' != 'success']){?>
                                 <form action="http://internationalmachinery.eu/processsendblue.php<?php //the_permalink(); ?>" method="post">
                                   <p><label for="name">Name: <span>*</span> <br><input type="text" name="message_name" value="<?php echo esc_attr($_POST['message_name']); ?>"></label></p>
+                                  <p><label for="name">Surname: <br><input type="text" name="sure_name" value="<?php echo esc_attr($_POST['sure_name']); ?>"></label></p>
                                   <p><label for="message_email">Email: <span>*</span> <br><input type="text" name="message_email" value="<?php echo esc_attr($_POST['message_email']); ?>"></label></p>
-                                  <p><label for="message_text">Message: <span>*</span> <br><textarea type="text" name="message_text" ><?php echo esc_textarea($_POST['message_text']); ?></textarea></label></p>
+                                  <p><label for="message_text">Message: <br><textarea type="text" name="message_text" ><?php echo esc_textarea($_POST['message_text']); ?></textarea></label></p>
                                  
                                   <input type="hidden" name="submitted" value="1">
-                                  <p><input type="submit" value="Send"></p>
+                                  <p><input type="submit" value="Send" class="custom-btn"></p>
                                 </form>
+                                <?php //} ?>
                               </div>
 				<?php //comments_template( '', true ); ?>
                           <?php endwhile; // end of the loop. ?>
